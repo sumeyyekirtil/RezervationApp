@@ -15,8 +15,11 @@ namespace RezervationApp.Entities
 		public DateTime StartDate { get; set; }
 		[Display(Name = "Randevu Bitiş Tarihi")]
 		public DateTime EndDate { get; set; }
+		[Display(Name = "Kullanıcı")]
 		public User? User { get; set; }
+		[Display(Name = "Uzman")]
 		public Employee? Employee { get; set; }
+		[Display(Name = "Müşterilwe")]
 		public Customer? Customer { get; set; }
 	}
 }
