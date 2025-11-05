@@ -21,7 +21,8 @@ namespace RezervationApp.Entities
 		[Display(Name = "Admin?")]
 		public bool IsAdmin { get; set; }
 		[Display(Name = "Eklenme Tarihi"), ScaffoldColumn(false)]
-		public DateTime CreateDate { get; set; }
-		public Guid? UserGuid { get; set; } //Jwt için property ler
+		public DateTime CreateDate { get; set; } = DateTime.Now;
+		[ScaffoldColumn(false)]
+		public Guid? UserGuid { get; set; } = Guid.NewGuid(); //Jwt için property ler
 	}
 }
