@@ -1,21 +1,27 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using RezervationApp.Data;
 using RezervationApp.Models;
+using System.Diagnostics;
 
 namespace RezervationApp.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+		private readonly DatabaseContext _context;
 
-        public HomeController(ILogger<HomeController> logger)
-        {
-            _logger = logger;
-        }
+		public HomeController(DatabaseContext context)
+		{
+			_context = context;
+		}
 
-        public IActionResult Index()
+		public IActionResult Index()
         {
-            return View();
+            var model = new HomePageViewModel
+            {
+                Sliders = _context.Sliders.ToList(), //null referance exceptions error is solved!
+                Services = _context.Services.Where(x => x.IsHome && x.IsActive).ToList()
+            };
+			return View(model);
         }
 
         public IActionResult Privacy()

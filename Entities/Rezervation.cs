@@ -19,7 +19,7 @@ namespace RezervationApp.Entities
 		public User? User { get; set; }
 		[Display(Name = "Uzman")]
 		public Employee? Employee { get; set; }
-		[Display(Name = "Müşterilwe")]
+		[Display(Name = "Müşteriler")]
 		public Customer? Customer { get; set; }
 	}
 }

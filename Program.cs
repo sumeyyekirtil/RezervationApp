@@ -1,5 +1,6 @@
 using RezervationApp.Data;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace RezervationApp
 {
@@ -15,6 +16,8 @@ namespace RezervationApp
 			builder.Services.AddSession();
 
 			builder.Services.AddDbContext<DatabaseContext>();
+
+			builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(); //authorize iþlemi için //yapýlmazsa authentica schema error fýrlatýr
 
 			builder.Services.AddAuthorization(x =>
 			{
@@ -38,6 +41,8 @@ namespace RezervationApp
 
 			app.UseHttpsRedirection();
 			app.UseRouting();
+
+			app.UseAuthentication();
 
 			app.UseAuthorization();
 
