@@ -4,7 +4,6 @@
     ViewData["Title"] = "Kullanıcı Oluştur";
 }
 
-
 <hr />
 <div class="row table-hover">
     <div class="col-md-4">
@@ -39,6 +38,11 @@
                 <label class="form-check-label">
                     <input class="form-check-input" asp-for="IsAdmin" /> @Html.DisplayNameFor(model => model.IsAdmin)
                 </label>
+            </div>
+            @*Sonradan eklenen kolon usertype*@
+            <div class="form-group">
+                <label asp-for="UserType" class="control-label"></label>
+                <select asp-for="UserType" class="form-control" asp-items="ViewBag.UserTypes"></select>
             </div>
             <div class="form-group">
                 <input type="submit" value="Ekle" class="btn btn-primary" />

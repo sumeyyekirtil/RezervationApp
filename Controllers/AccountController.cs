@@ -37,8 +37,10 @@ namespace RezervationApp.Controllers
 				// Giriş başarılı, kullanıcıyı yönlendir
 				var haklar = new List<Claim>() //kullanıcı hakları tanımladık
 				{
-					new(ClaimTypes.Email, user.Email), //claim = hak (kullanıcıya tanımlanan haklar)
-						new(ClaimTypes.Role, user.IsAdmin ? "Admin" : "User") //giriş yapan kullanıcı admin yetkisiyle değilse user yetkisiyle giriş yapsın.
+					new(ClaimTypes.Name, user.Name + " " + user.Surname), //claim = hak (kullanıcıya tanımlanan haklar)
+					new(ClaimTypes.Email, user.Email),
+					new(ClaimTypes.Role, user.IsAdmin ? "Admin" : "User"), //giriş yapan kullanıcı admin yetkisiyle değilse user yetkisiyle giriş yapsın.
+					new(ClaimTypes.UserData, user.UserGuid.Value.ToString()),
 				};
 				var kullaniciKimligi = new ClaimsIdentity(haklar, "Login"); //kullanıcı için bir kimlik oluşturduk
 				ClaimsPrincipal claimsPrincipal = new(kullaniciKimligi); //bu sınıftan bir nesne oluşturup bilgilerde saklı haklar ile kural oluşturulabilir
@@ -82,6 +84,7 @@ namespace RezervationApp.Controllers
 				{
 					user.IsActive = true;
 					user.IsAdmin = false;
+					user.UserType = UserType.Customer; //userType ı customer yani müşteri olarak ayarla (kayıt işleminde)
 					_context.Users.Add(user);
 					_context.SaveChanges();
 					//_userService.AddUser(user);

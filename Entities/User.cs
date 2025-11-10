@@ -24,5 +24,7 @@ namespace RezervationApp.Entities
 		public DateTime CreateDate { get; set; } = DateTime.Now;
 		[ScaffoldColumn(false)]
 		public Guid? UserGuid { get; set; } = Guid.NewGuid(); //Jwt için property ler
+		[Display(Name = "Kullanıcı Tipi")]
+		public UserType UserType { get; set; } = UserType.None;
 	}
 }

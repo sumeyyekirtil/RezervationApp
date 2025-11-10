@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RezervationApp.Data;
 using RezervationApp.Entities;
@@ -43,6 +44,7 @@ namespace RezervationApp.Areas.Admin.Controllers
         // GET: Admin/Users/Create
         public IActionResult Create()
         {
+            ViewBag.UserTypes = new SelectList(Enum.GetValues<UserType>());
             return View();
         }
 
@@ -57,7 +59,8 @@ namespace RezervationApp.Areas.Admin.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(user);
+			ViewBag.UserTypes = new SelectList(Enum.GetValues<UserType>());
+			return View(user);
         }
 
         // GET: Admin/Users/Edit/5
@@ -67,13 +70,14 @@ namespace RezervationApp.Areas.Admin.Controllers
             {
                 return NotFound();
             }
-
-            var user = await _context.Users.FindAsync(id);
+			
+			var user = await _context.Users.FindAsync(id);
             if (user == null)
             {
                 return NotFound();
             }
-            return View(user);
+			ViewBag.UserTypes = new SelectList(Enum.GetValues<UserType>());
+			return View(user);
         }
 
         // POST: Admin/Users/Edit/5
@@ -104,7 +108,8 @@ namespace RezervationApp.Areas.Admin.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+				ViewBag.UserTypes = new SelectList(Enum.GetValues<UserType>());
+				return RedirectToAction(nameof(Index));
             }
             return View(user);
         }
@@ -123,8 +128,8 @@ namespace RezervationApp.Areas.Admin.Controllers
             {
                 return NotFound();
             }
-
-            return View(user);
+			ViewBag.UserTypes = new SelectList(Enum.GetValues<UserType>());
+			return View(user);
         }
 
         // POST: Admin/Users/Delete/5
@@ -132,13 +137,12 @@ namespace RezervationApp.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var user = await _context.Users.FindAsync(id);
+			var user = await _context.Users.FindAsync(id);
             if (user != null)
             {
                 _context.Users.Remove(user);
             }
-
-            await _context.SaveChangesAsync();
+			await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
