@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using RezervationApp.Data;
 using RezervationApp.Entities;
 using System.Security.Claims;
@@ -14,8 +16,42 @@ namespace RezervationApp.Controllers
 		{
 			_context = context;
 		}
+
+		[Authorize]
 		public IActionResult Index()
 		{
+			var userId = HttpContext.User.FindFirst(ClaimTypes.Sid)?.Value;
+			if (userId is null) //eğer sid değeri cookie içinde bozulursa oturumu kapat
+			{
+				HttpContext.SignOutAsync(); //oturum kapat
+				return RedirectToAction("Login", "Account"); //logine yönlendir
+			}
+			var model = _context.Users.Find(Convert.ToInt32(userId));
+			if (model == null)
+			{
+				HttpContext.SignOutAsync(); //oturum kapat
+				return RedirectToAction("Login", "Account"); //logine yönlendir
+			}
+			return View(model);
+		}
+
+		[Authorize]
+		[HttpPost]
+		public async Task<IActionResult> Index(User user)
+		{
+			if (ModelState.IsValid)
+			{
+				try
+				{
+					_context.Update(user);
+					await _context.SaveChangesAsync();
+				}
+				catch
+				{
+					ModelState.AddModelError("", "Kayıt sırasında bir hata oluştu!");
+				}
+				return RedirectToAction(nameof(Index));
+			}
 			return View();
 		}
 
@@ -27,7 +63,7 @@ namespace RezervationApp.Controllers
 
 
 		[HttpPost]
-		public IActionResult Login(string email, string password)
+		public IActionResult Login(string email, string password, string ReturnUrl)
 		{
 			// Kullanıcı doğrulama işlemleri burada yapılacak (veritabanı kontrolü)
 			//var user = _context.Users.FirstOrDefault(u => u.Email == email && u.Password == password);
@@ -37,14 +73,19 @@ namespace RezervationApp.Controllers
 				// Giriş başarılı, kullanıcıyı yönlendir
 				var haklar = new List<Claim>() //kullanıcı hakları tanımladık
 				{
-					new(ClaimTypes.Name, user.Name + " " + user.Surname), //claim = hak (kullanıcıya tanımlanan haklar)
+					new(ClaimTypes.Name, user.Name), //claim = hak (kullanıcıya tanımlanan haklar)
 					new(ClaimTypes.Email, user.Email),
+					new(ClaimTypes.Sid, user.Id.ToString()), //id yi string e çevirip kullandık
 					new(ClaimTypes.Role, user.IsAdmin ? "Admin" : "User"), //giriş yapan kullanıcı admin yetkisiyle değilse user yetkisiyle giriş yapsın.
 					new(ClaimTypes.UserData, user.UserGuid.Value.ToString()),
 				};
 				var kullaniciKimligi = new ClaimsIdentity(haklar, "Login"); //kullanıcı için bir kimlik oluşturduk
 				ClaimsPrincipal claimsPrincipal = new(kullaniciKimligi); //bu sınıftan bir nesne oluşturup bilgilerde saklı haklar ile kural oluşturulabilir
 				HttpContext.SignInAsync(claimsPrincipal); //yukarıdaki yetkilerle sisteme giriş yaptık
+				if (!string.IsNullOrEmpty(ReturnUrl))
+				{
+					return Redirect(ReturnUrl);
+				}
 				return RedirectToAction("Index", "Home");
 			}
 			else
